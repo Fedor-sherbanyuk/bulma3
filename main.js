@@ -1,3 +1,4 @@
+let array = [];
 const list = ["Explain event delegation.",
     "Explain how this works in JavaScript.",
     "Can you give an example of one of the ways that working with this has changed in ES6?",
@@ -53,7 +54,6 @@ const list = ["Explain event delegation.",
 
 function randomQuestion() {
     const random = Math.floor(Math.random() * 2);
-    console.log(random);
     let str;
     if (random === 1) {
         str = `<div class="icon-text">
@@ -78,7 +78,29 @@ const replaced = `
     <div class="container title is-4">Example Java Script Question
         <br> <br><div id="cardNew" class="hero-body card-header-title">
         </div>
+         <div class="field is-grouped">
+    <div class="control is-expanded">
+        <label>
+            <textarea class="textarea is-primary" placeholder="Введите текст сообщения"></textarea>
+        </label>
     </div>
+    <div class="control is-right">
+        <button class="button is-primary" onclick="setQuestionInList()">Отправить</button>
+    </div>    
+</div>
+ <label class="checkbox">
+                            <input id="disassembled" type="checkbox">
+                            Disassembled
+                        </label>
+                        <label class="checkbox">
+                            <input id="noDisassembled" type="checkbox">
+                            Not disassembled
+                        </label>
+                         <label class="checkbox">
+                            <input id="showAll" type="checkbox">
+                            Show all
+                        </label>
+    </div>   
 </section>
 `;
 
@@ -86,12 +108,74 @@ function display() {
     return document.getElementById("card").insertAdjacentHTML("beforebegin", `${replaced}`);
 }
 
-let array = [];
-for (let i = 0; i < list.length; i++) {
-    array = [...array, {strings: list[i], func: randomQuestion()}];
+function addQuestionInArray(list, array) {
+    for (let i = 0; i < list.length; i++) {
+        array = [...array, {strings: list[i], func: randomQuestion()}];
+    }
+    return array;
 }
+
+array = addQuestionInArray(list, array);
+
+//Показываем экран с текстом
 array.forEach(el => Object.is(el.strings, "Explain event delegation.") ? display() : null);
-array.forEach(el => {
-    document.getElementById("cardNew").insertAdjacentHTML("beforebegin", `<div class="card"><div class="card-header-title"> ${el.strings} </div> ${el.func}</div> 
+
+
+function displayQuestionInArray(array) {
+    array.forEach(el => {
+            document.getElementById("cardNew").insertAdjacentHTML("beforebegin", `<div class="card"><div class="card-header-title"> ${el.strings} </div> ${el.func}</div> 
 <br> <br>`)
-});
+        }
+    );
+}
+
+//Показываем на странице вопросы
+displayQuestionInArray(array);
+
+//Срабатывает при клике на кнопку
+function setQuestionInList() {
+    const textareaText = [document.querySelector('.textarea').value];
+    list.push(textareaText.toString());
+    if (textareaText[0].length < 4 || textareaText[0].trim() === '' || array.find(value => value.strings === textareaText.toString())) {
+        document.querySelector('.textarea').value = '';
+        return alert('Please enter a question');
+    }
+    array = addQuestionInArray(textareaText, array);
+    displayQuestionInArray(array.filter(value => value.strings === textareaText.toString()));
+    document.querySelector('.textarea').value = '';
+}
+
+document.addEventListener('change', filterAnswer);
+
+//Фильтруем вопросы
+function filterAnswer() {
+    const disassembledCheck = document.getElementById("disassembled").checked;
+    const noDisassembledCheck = document.getElementById("noDisassembled").checked;
+    const showAllCheck = document.getElementById("showAll").checked;
+    const card = document.querySelectorAll('.card');
+
+    if (disassembledCheck && !noDisassembledCheck && !showAllCheck) {
+        card.forEach(el => el.querySelector('span + span').innerText === 'Disassembled' ? el.style.display = 'none' : el.style.display = 'block');
+    } else if (!disassembledCheck && noDisassembledCheck && !showAllCheck) {
+        card.forEach(el => el.querySelector('span + span').innerText === 'Not disassembled' ? el.style.display = 'none' : el.style.display = 'block');
+    }else if (!disassembledCheck && !noDisassembledCheck && showAllCheck) {
+            card.forEach(el => el.style.display = 'block');
+    }
+    else if (disassembledCheck && noDisassembledCheck) {
+        window.location.reload();
+        alert('Please select only one option');
+    }
+    updateCheckAfterHalfSeconds();
+}
+
+function updateCheckAfterHalfSeconds() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            document.getElementById("disassembled").checked = false;
+            document.getElementById("noDisassembled").checked = false;
+            document.getElementById("showAll").checked = false;
+        }, 500);
+    });
+}
+
+filterAnswer();
