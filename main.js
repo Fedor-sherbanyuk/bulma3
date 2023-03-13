@@ -91,15 +91,7 @@ const replaced = `
  <label class="checkbox">
                             <input id="disassembled" type="checkbox">
                             Disassembled
-                        </label>
-                        <label class="checkbox">
-                            <input id="noDisassembled" type="checkbox">
-                            Not disassembled
-                        </label>
-                         <label class="checkbox">
-                            <input id="showAll" type="checkbox">
-                            Show all
-                        </label>
+                        </label>                      
     </div>   
 </section>
 `;
@@ -150,32 +142,13 @@ document.addEventListener('change', filterAnswer);
 //Фильтруем вопросы
 function filterAnswer() {
     const disassembledCheck = document.getElementById("disassembled").checked;
-    const noDisassembledCheck = document.getElementById("noDisassembled").checked;
-    const showAllCheck = document.getElementById("showAll").checked;
     const card = document.querySelectorAll('.card');
 
-    if (disassembledCheck && !noDisassembledCheck && !showAllCheck) {
-        card.forEach(el => el.querySelector('span + span').innerText === 'Disassembled' ? el.style.display = 'none' : el.style.display = 'block');
-    } else if (!disassembledCheck && noDisassembledCheck && !showAllCheck) {
+    if (disassembledCheck) {
         card.forEach(el => el.querySelector('span + span').innerText === 'Not disassembled' ? el.style.display = 'none' : el.style.display = 'block');
-    }else if (!disassembledCheck && !noDisassembledCheck && showAllCheck) {
-            card.forEach(el => el.style.display = 'block');
+    } else if (!disassembledCheck) {
+        card.forEach(el => el.style.display = 'block');
     }
-    else if (disassembledCheck && noDisassembledCheck) {
-        window.location.reload();
-        alert('Please select only one option');
-    }
-    updateCheckAfterHalfSeconds();
-}
-
-function updateCheckAfterHalfSeconds() {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            document.getElementById("disassembled").checked = false;
-            document.getElementById("noDisassembled").checked = false;
-            document.getElementById("showAll").checked = false;
-        }, 500);
-    });
 }
 
 filterAnswer();
